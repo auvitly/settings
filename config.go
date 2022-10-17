@@ -5,6 +5,8 @@ import (
 )
 
 type Configurator interface {
+	LoadConfiguration() error
+	Unmarshal(config interface{}) error
 }
 
 func New(name string, path string) *internal.Configurator {

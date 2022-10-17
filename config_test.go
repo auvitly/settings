@@ -25,7 +25,7 @@ func TestConfigurator(t *testing.T) {
 	conf := &Config{}
 	c.LoadConfiguration()
 
-	c.UnmarshalInto(conf)
+	c.Unmarshal(conf)
 
 	logrus.Info()
 }

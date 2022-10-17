@@ -66,7 +66,7 @@ func (c *Configurator) LoadConfiguration() error {
 
 }
 
-func (c *Configurator) UnmarshalInto(config interface{}) error {
+func (c *Configurator) Unmarshal(config interface{}) error {
 	return c.handle(config)
 
 }
