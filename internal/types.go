@@ -4,6 +4,8 @@ var defaultPaths = []string{".", "/usr/local/etc", "/etc"}
 
 const defaultFileName = "config"
 
+const urlType = "url.URL"
+
 const (
 	env          = "env"
 	toml         = "toml"

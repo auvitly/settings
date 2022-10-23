@@ -113,7 +113,9 @@ func (h *Handler) getValue(key, value string) interface{} {
 					h.lv[tag] = result
 				}
 			case defaultValue:
-				h.lv[tag] = h.fieldTags[key]
+				if result, ok := h.fieldTags[tag]; ok {
+					h.lv[tag] = result
+				}
 			}
 		}
 	}

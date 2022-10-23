@@ -6,7 +6,8 @@
         "duration": "2m"
       },
       {
-        "string": "string"
+        "string": "string",
+        "url": "https://google.ru"
       }
     ]
   }

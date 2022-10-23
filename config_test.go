@@ -1,6 +1,7 @@
 package config
 
 import (
+	"net/url"
 	"settings/internal"
 	"testing"
 	"time"
@@ -20,6 +21,7 @@ type Simple struct {
 	Int      int           `json:"int"`
 	String   *string       `json:"string" default:"hello"`
 	Duration time.Duration `json:"duration" default:"1m"`
+	Url      *url.URL      `json:"url" default:"vk.com"`
 }
 
 func TestConfigurator(t *testing.T) {
