@@ -1,31 +1,35 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
 	"settings/internal"
 	"testing"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	Credentials *Subconfig `json:"credentials"`
+	Structure *Subconfig `json:"structure"`
 }
 
 type Subconfig struct {
-	Host string             `json:"host" default:"hello"`
-	Port string             `json:"port"`
-	Map  map[string]float32 `json:"map"`
-	SS   []string           `json:"strslice"`
-	SI   []int              `json:"intslice"`
+	Slice []Simple `json:"slice"`
+}
+
+type Simple struct {
+	Int      int           `json:"int"`
+	String   *string       `json:"string" default:"hello"`
+	Duration time.Duration `json:"duration" default:"1m"`
 }
 
 func TestConfigurator(t *testing.T) {
 
-	c := internal.New("json", "./../../config/")
+	c := internal.New("json", "./")
 
 	conf := &Config{}
 	c.LoadConfiguration()
 
-	c.Unmarshal(conf)
+	err := c.Unmarshal(conf)
 
-	logrus.Info()
+	logrus.Info(err)
 }

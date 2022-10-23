@@ -3,6 +3,8 @@ package internal
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"io"
+	"reflect"
 )
 
 type Configurator struct {
@@ -10,6 +12,7 @@ type Configurator struct {
 	fileName  string
 	filePaths []string
 	viper     *viper.Viper
+	config    map[string]interface{}
 }
 
 func New(name string, path string) *Configurator {
@@ -46,11 +49,17 @@ func New(name string, path string) *Configurator {
 
 }
 
-func (c *Configurator) AddConfigPath(paths ...string) {
-	c.filePaths = append(c.filePaths, paths...)
-	for _, path := range paths {
-		c.viper.AddConfigPath(path)
+func (c *Configurator) ReadConfiguration(config io.Reader) error {
+
+	// loading settings into viper
+	err := c.viper.ReadConfig(config)
+	if err != nil {
+		c.logger.WithError(err).Error("Unable to load file configuration from io.Reader")
+		return err
 	}
+
+	return nil
+
 }
 
 func (c *Configurator) LoadConfiguration() error {
@@ -61,12 +70,22 @@ func (c *Configurator) LoadConfiguration() error {
 		c.logger.WithError(err).Error("Unable to load file configuration from current paths")
 		return err
 	}
+	c.config = c.viper.AllSettings()
 
 	return nil
 
 }
 
 func (c *Configurator) Unmarshal(config interface{}) error {
-	return c.handle(config)
+
+	if root, err := c.newRootHandler(config); err != nil {
+		return err
+	} else {
+		if err = c.handle(root); err != nil {
+			root.reflectValue.Set(reflect.Zero(reflect.TypeOf(config).Elem()))
+			return err
+		}
+		return nil
+	}
 
 }

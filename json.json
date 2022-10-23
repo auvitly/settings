@@ -1,0 +1,13 @@
+{
+  "structure": {
+    "slice": [
+      {
+        "int": 1,
+        "duration": "2m"
+      },
+      {
+        "string": "string"
+      }
+    ]
+  }
+}
