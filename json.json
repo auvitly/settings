@@ -2,12 +2,14 @@
   "structure": {
     "slice": [
       {
-        "int": 1,
-        "duration": "2m"
+
       },
       {
+        "int": 1,
         "string": "string",
-        "url": "https://google.ru"
+        "float64": 1.52,
+        "bool": false,
+        "dur": "5h"
       }
     ]
   }

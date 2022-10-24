@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"io"
 	"reflect"
+	"time"
 )
 
 type Configurator struct {
@@ -13,6 +14,7 @@ type Configurator struct {
 	filePaths []string
 	viper     *viper.Viper
 	config    map[string]interface{}
+	options   map[Options]interface{}
 }
 
 func New(name string, path string) *Configurator {
@@ -22,6 +24,7 @@ func New(name string, path string) *Configurator {
 		fileName:  name,
 		filePaths: defaultPaths,
 		viper:     viper.New(),
+		options:   make(map[Options]interface{}),
 	}
 
 	// set filename
@@ -44,6 +47,9 @@ func New(name string, path string) *Configurator {
 	for _, path = range c.filePaths {
 		c.viper.AddConfigPath(path)
 	}
+
+	// set default options
+	c.setDefaultOptions()
 
 	return c
 
@@ -87,5 +93,25 @@ func (c *Configurator) Unmarshal(config interface{}) error {
 		}
 		return nil
 	}
+
+}
+
+func (c *Configurator) setDefaultOptions() {
+	// Time format
+	c.options[TimeFormat] = time.RFC3339
+}
+
+func (c *Configurator) SetOption(options Options, value interface{}) error {
+
+	switch options {
+	case TimeFormat:
+		format, ok := value.(string)
+		if !ok {
+			return ErrInvalidOptions
+		}
+		c.options[TimeFormat] = format
+	}
+
+	return nil
 
 }

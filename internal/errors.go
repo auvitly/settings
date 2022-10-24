@@ -14,6 +14,7 @@ const (
 	ErrNotAddressableField  cer.Error = "the value is not addressable"
 	ErrHandle               cer.Error = "unknown error"
 	ErrBaseTypeNotMatch     cer.Error = "types not match"
+	ErrInvalidOptions       cer.Error = "invalid value options"
 )
 
 func errBaserTypeNotMatch(tag, outType, foundedType string) error {

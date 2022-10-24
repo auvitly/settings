@@ -1,12 +1,10 @@
 package config
 
 import (
-	"net/url"
+	"github.com/sirupsen/logrus"
 	"settings/internal"
 	"testing"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
@@ -18,10 +16,11 @@ type Subconfig struct {
 }
 
 type Simple struct {
-	Int      int           `json:"int"`
-	String   *string       `json:"string" default:"hello"`
-	Duration time.Duration `json:"duration" default:"1m"`
-	Url      *url.URL      `json:"url" default:"vk.com"`
+	Int      int64         `json:"int" default:"10"`
+	String   string        `json:"string" default:"hello"`
+	Float64  float64       `json:"float64" default:"23.1"`
+	Bool     bool          `json:"bool" default:"true"`
+	Duration time.Duration `json:"dur" default:"1m"`
 }
 
 func TestConfigurator(t *testing.T) {

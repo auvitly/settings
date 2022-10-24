@@ -4,7 +4,16 @@ var defaultPaths = []string{".", "/usr/local/etc", "/etc"}
 
 const defaultFileName = "config"
 
-const urlType = "url.URL"
+// Struct types
+const (
+	urlType  = "url.URL"
+	timeType = "time.Time"
+)
+
+// Based on general types
+const (
+	durationType = "<time.Duration Value>"
+)
 
 const (
 	env          = "env"
