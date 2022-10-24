@@ -115,7 +115,11 @@ func (c *Configurator) handleTime(h *Handler) (err error) {
 		}
 	}
 	if len(rawTime) != 0 {
-		time, err := time.Parse(time.RFC3339, rawTime)
+		opt, ok := c.options[TimeFormat].(string)
+		if !ok {
+			return ErrInvalidOptions
+		}
+		time, err := time.Parse(opt, rawTime)
 		if err != nil {
 			return errors.Wrapf(err, "value: %v", h.obtainHandlerName(tag))
 		}
