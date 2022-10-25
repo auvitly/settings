@@ -15,6 +15,7 @@ const (
 	durationType = "<time.Duration Value>"
 )
 
+// Supported tags
 const (
 	env          = "env"
 	toml         = "toml"
@@ -22,10 +23,11 @@ const (
 	yaml         = "yaml"
 	json         = "json"
 	xml          = "xml"
+	validation   = "validation"
 	defaultValue = "default"
 )
 
-var supportedTags = []string{env, toml, omit, yaml, xml, json, defaultValue}
+var supportedTags = []string{env, toml, yaml, xml, json, omit, validation, defaultValue}
 
 type Tags map[string]string
 type LoadValues map[string]interface{}

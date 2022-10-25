@@ -41,7 +41,7 @@ func (c *Configurator) handleMap(handler *Handler) (err error) {
 					child:          make([]*Handler, 0),
 					parent:         handler,
 					fieldTags:      Tags{fieldKey: key},
-					lv:             make(LoadValues),
+					loadValues:     make(LoadValues),
 					validator:      handler.validator,
 				}
 				if err = c.handle(subHandler); err != nil {

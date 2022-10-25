@@ -9,6 +9,11 @@ import (
 )
 
 func (c *Configurator) handleStruct(handler *Handler) (err error) {
+
+	if err = c.validator.Struct(handler.reflectValue.Interface()); err != nil {
+		return err
+	}
+
 	num := handler.reflectType.NumField()
 	for i := 0; i < num; i++ {
 		handler.parseStructField(i)
@@ -43,15 +48,15 @@ func (c *Configurator) handleUrl(h *Handler) (err error) {
 		switch tag {
 		case env:
 			if result, ok := os.LookupEnv(h.fieldTags[tag]); ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		case toml, yaml, xml, json:
 			if result, ok := h.parent.storage[h.fieldTags[tag]]; ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		default:
 			if result, ok := h.fieldTags[tag]; ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		}
 	}
@@ -59,7 +64,7 @@ func (c *Configurator) handleUrl(h *Handler) (err error) {
 	// Getting raw urlType
 	var rawUrl, tag string
 	for _, tag = range supportedTags {
-		if value, ok := h.lv[tag]; ok {
+		if value, ok := h.loadValues[tag]; ok {
 			rawUrl, ok = value.(string)
 			if !ok {
 				return errors.Wrapf(ErrBaseTypeNotMatch, "unsupported value: %v, define string for %s type field",
@@ -88,15 +93,15 @@ func (c *Configurator) handleTime(h *Handler) (err error) {
 		switch tag {
 		case env:
 			if result, ok := os.LookupEnv(h.fieldTags[tag]); ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		case toml, yaml, xml, json:
 			if result, ok := h.parent.storage[h.fieldTags[tag]]; ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		default:
 			if result, ok := h.fieldTags[tag]; ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		}
 	}
@@ -104,7 +109,7 @@ func (c *Configurator) handleTime(h *Handler) (err error) {
 	// Getting raw urlType
 	var rawTime, tag string
 	for _, tag = range supportedTags {
-		if value, ok := h.lv[tag]; ok {
+		if value, ok := h.loadValues[tag]; ok {
 			rawTime, ok = value.(string)
 			if !ok {
 				return errors.Wrapf(ErrBaseTypeNotMatch, "unsupported value: %v, define string for %s type field",

@@ -2,9 +2,6 @@
   "structure": {
     "slice": [
       {
-
-      },
-      {
         "int": 1,
         "string": "string",
         "float64": 1.52,

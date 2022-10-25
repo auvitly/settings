@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
@@ -15,6 +16,7 @@ type Configurator struct {
 	viper     *viper.Viper
 	config    map[string]interface{}
 	options   map[Options]interface{}
+	validator *validator.Validate
 }
 
 func New(name string, path string) *Configurator {
@@ -25,6 +27,7 @@ func New(name string, path string) *Configurator {
 		filePaths: defaultPaths,
 		viper:     viper.New(),
 		options:   make(map[Options]interface{}),
+		validator: validator.New(),
 	}
 
 	// set filename
@@ -99,6 +102,7 @@ func (c *Configurator) Unmarshal(config interface{}) error {
 func (c *Configurator) setDefaultOptions() {
 	// Time format
 	c.options[TimeFormat] = time.RFC3339
+
 }
 
 func (c *Configurator) SetOption(options Options, value interface{}) error {

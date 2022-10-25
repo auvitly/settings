@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var validatorModule = validator.New()
-
 type Handler struct {
 	name           string
 	storage        map[string]interface{}
@@ -18,7 +16,7 @@ type Handler struct {
 	child          []*Handler
 	parent         *Handler
 	fieldTags      Tags
-	lv             LoadValues
+	loadValues     LoadValues
 	validator      *validator.Validate
 }
 
@@ -32,8 +30,8 @@ func (c *Configurator) newRootHandler(value interface{}) (*Handler, error) {
 		child:        make([]*Handler, 0),    // used
 		parent:       nil,                    // user
 		fieldTags:    make(Tags),             // not used for root handler
-		lv:           make(LoadValues),
-		validator:    validatorModule, // used
+		loadValues:   make(LoadValues),
+		validator:    c.validator, // used
 	}
 
 	// It is necessary to check the received value for the possibility of processing
@@ -91,9 +89,9 @@ func (h *Handler) parseStructField(index int) {
 		reflectType:    h.reflectValue.Field(index).Type(),
 		structureField: h.reflectType.Field(index),
 		fieldTags:      make(Tags),
-		lv:             make(LoadValues),
+		loadValues:     make(LoadValues),
 		parent:         h,
-		validator:      validatorModule,
+		validator:      h.validator,
 	}
 
 	// Searching for tags from the list of allowed tags

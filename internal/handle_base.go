@@ -11,7 +11,7 @@ import (
 // When processing simple values, several stages can be distinguished:
 // 1. At the first stage, a type check is performed (structure, slice, etc.).
 // If the type corresponds to the required one, then we proceed to the second stage
-// 2. We load all available values into the lv handler variable
+// 2. We load all available values into the loadValues handler variable
 
 func (c *Configurator) handleBaseTypes(handler *Handler) (err error) {
 
@@ -26,7 +26,7 @@ func (c *Configurator) handleBaseTypes(handler *Handler) (err error) {
 		}
 		// Stage 3
 		for key, value := range handler.fieldTags {
-			storageValue := handler.lv[key]
+			storageValue := handler.loadValues[key]
 			is := handler.isNeedToSetValue(key)
 			if storageValue == nil || !is {
 				continue
@@ -90,12 +90,12 @@ func (h *Handler) downloadTagValueBundles() error {
 		// Search among env
 		case env:
 			if result, ok := os.LookupEnv(field); ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		// Search among viper values
 		case toml, yaml, xml, json:
 			if result, ok := h.parent.storage[field]; ok {
-				h.lv[tag] = result
+				h.loadValues[tag] = result
 			}
 		// Detect default value
 		case defaultValue:
@@ -104,9 +104,9 @@ func (h *Handler) downloadTagValueBundles() error {
 				kind := h.reflectValue.Kind()
 				switch kind {
 				case reflect.String:
-					h.lv[tag] = result
+					h.loadValues[tag] = result
 				case reflect.Bool:
-					h.lv[tag], err = strconv.ParseBool(result)
+					h.loadValues[tag], err = strconv.ParseBool(result)
 					if err != nil {
 						return err
 					}
@@ -117,12 +117,12 @@ func (h *Handler) downloadTagValueBundles() error {
 					switch kindT {
 					case durationType:
 						dur, err := time.ParseDuration(result)
-						h.lv[tag] = float64(dur)
+						h.loadValues[tag] = float64(dur)
 						if err != nil {
 							return err
 						}
 					default:
-						h.lv[tag], err = strconv.ParseFloat(result, 64)
+						h.loadValues[tag], err = strconv.ParseFloat(result, 64)
 						if err != nil {
 							return err
 						}
@@ -135,10 +135,15 @@ func (h *Handler) downloadTagValueBundles() error {
 }
 
 func (h *Handler) isNeedToSetValue(key string) bool {
+	// Skip field with omit tag
+	if _, ok := h.fieldTags[omit]; ok {
+		return false
+	}
 	for _, tag := range supportedTags {
+		// Else cases
 		switch tag {
 		case env:
-			_, ok := h.lv[tag]
+			_, ok := h.loadValues[tag]
 			if ok {
 				if key == tag {
 					return true
@@ -146,7 +151,7 @@ func (h *Handler) isNeedToSetValue(key string) bool {
 				return false
 			}
 		case toml, yaml, xml, json:
-			_, ok := h.lv[tag]
+			_, ok := h.loadValues[tag]
 			if ok {
 				if key == tag {
 					return true
@@ -154,7 +159,7 @@ func (h *Handler) isNeedToSetValue(key string) bool {
 				return false
 			}
 		default:
-			_, ok := h.lv[tag]
+			_, ok := h.loadValues[tag]
 			if ok {
 				if key == tag {
 					return true
@@ -174,30 +179,30 @@ func (h *Handler) getValue(key, value string) interface{} {
 			switch key {
 			case env:
 				if result, ok := os.LookupEnv(value); ok {
-					h.lv[tag] = result
+					h.loadValues[tag] = result
 				}
 			case toml, yaml, xml, json:
 				if result, ok := h.parent.storage[value]; ok {
-					h.lv[tag] = result
+					h.loadValues[tag] = result
 				}
 			case defaultValue:
 				var err error
 				if result, ok := h.fieldTags[tag]; ok {
 					switch h.reflectValue.Kind() {
 					case reflect.String:
-						h.lv[tag] = result
+						h.loadValues[tag] = result
 					case reflect.Bool:
-						h.lv[tag], err = strconv.ParseBool(result)
+						h.loadValues[tag], err = strconv.ParseBool(result)
 						if err != nil {
 							return err
 						}
 					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-						h.lv[tag], err = strconv.ParseInt(result, 10, 64)
+						h.loadValues[tag], err = strconv.ParseInt(result, 10, 64)
 						if err != nil {
 							return err
 						}
 					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-						h.lv[tag], err = strconv.ParseUint(result, 10, 64)
+						h.loadValues[tag], err = strconv.ParseUint(result, 10, 64)
 						if err != nil {
 							return err
 						}
@@ -208,7 +213,7 @@ func (h *Handler) getValue(key, value string) interface{} {
 			}
 		}
 	}
-	return h.lv[key]
+	return h.loadValues[key]
 }
 
 func (h *Handler) setDuration(storageValue interface{}) (result bool, err error) {

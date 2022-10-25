@@ -60,6 +60,7 @@ func (c *Configurator) handleBytesSlice(handler *Handler) (err error) {
 }
 
 func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
+
 	var rawSlice []interface{}
 	for _, value := range handler.fieldTags {
 		if storage, ok := handler.parent.storage[value]; ok {
@@ -67,14 +68,41 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 			break
 		}
 	}
-	sliceTypeOf := reflect.SliceOf(handler.reflectValue.Type().Elem())
-	sliceValueOf := reflect.MakeSlice(sliceTypeOf, 0, len(rawSlice))
 
-	for index, value := range rawSlice {
+	var (
+		sliceTypeOf  reflect.Type
+		sliceValueOf reflect.Value
+	)
+
+	sliceTypeOf = reflect.SliceOf(handler.reflectValue.Type().Elem())
+	switch handler.reflectValue.Len() {
+	case 0:
+		sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
+	case len(rawSlice):
+		sliceValueOf = handler.reflectValue
+	default:
+		length := handler.reflectValue.Len()
+		for i := length; length < len(rawSlice); i++ {
+			if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
+				handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem().Addr())
+			} else {
+				handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem())
+			}
+		}
+		sliceValueOf = handler.reflectValue
+	}
+
+	length := handler.reflectValue.Len()
+	for index := 0; index < length; index++ {
+
 		// Creating internal storage for handler
-		subStorage, ok := value.(map[string]interface{})
-		if !ok {
-			return ErrHandle
+		var subStorage = make(map[string]interface{})
+		var ok bool
+		if index < len(rawSlice) {
+			subStorage, ok = rawSlice[index].(map[string]interface{})
+			if !ok {
+				return ErrHandle
+			}
 		}
 		// Make internal handler for one record
 		var fieldKey string
@@ -83,6 +111,7 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 				fieldKey = tag
 			}
 		}
+
 		subHandler := &Handler{
 			name:           fmt.Sprintf("%d", index),
 			storage:        subStorage,
@@ -92,18 +121,54 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 			child:          make([]*Handler, 0),
 			parent:         handler,
 			fieldTags:      Tags{fieldKey: fmt.Sprintf("%d", index)},
-			lv:             make(LoadValues),
+			loadValues:     make(LoadValues),
 			validator:      handler.validator,
 		}
 		if err = c.handle(subHandler); err != nil {
 			return err
 		}
+		handler.child = append(handler.child, subHandler)
 		if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
-			sliceValueOf = reflect.Append(sliceValueOf, subHandler.reflectValue.Addr())
+			handler.reflectValue.Index(index).Set(subHandler.reflectValue.Addr())
 		} else {
-			sliceValueOf = reflect.Append(sliceValueOf, subHandler.reflectValue)
+			handler.reflectValue.Index(index).Set(subHandler.reflectValue)
 		}
 	}
+	//
+	//for index, value := range rawSlice {
+	//	// Creating internal storage for handler
+	//	subStorage, ok := value.(map[string]interface{})
+	//	if !ok {
+	//		return ErrHandle
+	//	}
+	//	// Make internal handler for one record
+	//	var fieldKey string
+	//	for _, tag := range supportedTags {
+	//		if _, ok = handler.fieldTags[tag]; ok {
+	//			fieldKey = tag
+	//		}
+	//	}
+	//	subHandler := &Handler{
+	//		name:           fmt.Sprintf("%d", index),
+	//		storage:        subStorage,
+	//		reflectValue:   reflect.New(sliceTypeOf.Elem()).Elem(),
+	//		reflectType:    reflect.New(sliceTypeOf.Elem()).Elem().Type(),
+	//		structureField: reflect.StructField{},
+	//		child:          make([]*Handler, 0),
+	//		parent:         handler,
+	//		fieldTags:      Tags{fieldKey: fmt.Sprintf("%d", index)},
+	//		loadValues:     make(LoadValues),
+	//		validator:      handler.validator,
+	//	}
+	//	if err = c.handle(subHandler); err != nil {
+	//		return err
+	//	}
+	//	if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
+	//		handler.reflectValue.Index(index).Set(subHandler.reflectValue.Addr())
+	//	} else {
+	//		handler.reflectValue.Index(index).Set(subHandler.reflectValue)
+	//	}
+	//}
 	handler.reflectValue.Set(sliceValueOf)
 	return
 }
