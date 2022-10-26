@@ -7,15 +7,19 @@
         "float64": 1.52,
         "bool": false,
         "dur": "5h",
-        "servers": ["127.0.0.1", "123123"]
-      },
-      {
-        "int": 1,
-        "string": "string",
-        "float64": 1.52,
-        "bool": false,
-        "dur": "5h",
-        "servers": ["127.0.0.1", "123123"]
+        "servers": ["127.0.0.1", "123123"],
+        "map_type_1": {
+          "key": "value"
+        },
+        "map_type_2": {
+          "key": ["strings"]
+        },
+        "map_type_3": {
+          "key": {
+            "int": 1,
+            "string": "string"
+          }
+        }
       }
     ]
   }
