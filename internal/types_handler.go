@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"reflect"
@@ -99,9 +100,19 @@ func (h *Handler) parseStructField(index int) {
 		if len(handler.structureField.Tag.Get(tag)) != 0 {
 			handler.fieldTags[tag] = handler.structureField.Tag.Get(tag)
 		}
-		if result, ok := h.storage[handler.fieldTags[tag]].(map[string]interface{}); ok {
-			handler.storage = result
+		switch handler.parent.storage[handler.fieldTags[tag]].(type) {
+		case map[string]interface{}:
+			if result, ok := handler.parent.storage[handler.fieldTags[tag]].(map[string]interface{}); ok {
+				handler.storage = result
+			}
+		case []interface{}:
+			if result, ok := handler.parent.storage[handler.fieldTags[tag]].([]interface{}); ok {
+				for idx, value := range result {
+					handler.storage[fmt.Sprintf("%d", idx)] = value
+				}
+			}
 		}
+
 	}
 
 	h.child = append(h.child, handler)

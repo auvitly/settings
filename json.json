@@ -6,7 +6,16 @@
         "string": "string",
         "float64": 1.52,
         "bool": false,
-        "dur": "5h"
+        "dur": "5h",
+        "servers": ["127.0.0.1", "123123"]
+      },
+      {
+        "int": 1,
+        "string": "string",
+        "float64": 1.52,
+        "bool": false,
+        "dur": "5h",
+        "servers": ["127.0.0.1", "123123"]
       }
     ]
   }

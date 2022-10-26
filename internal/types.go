@@ -23,11 +23,10 @@ const (
 	yaml         = "yaml"
 	json         = "json"
 	xml          = "xml"
-	validation   = "validation"
 	defaultValue = "default"
 )
 
-var supportedTags = []string{env, toml, yaml, xml, json, omit, validation, defaultValue}
+var supportedTags = []string{env, toml, yaml, xml, json, omit, defaultValue}
 
 type Tags map[string]string
 type LoadValues map[string]interface{}

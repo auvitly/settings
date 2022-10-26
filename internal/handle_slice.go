@@ -92,16 +92,18 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 		sliceValueOf = handler.reflectValue
 	}
 
-	length := handler.reflectValue.Len()
+	length := sliceValueOf.Len()
 	for index := 0; index < length; index++ {
 
 		// Creating internal storage for handler
-		var subStorage = make(map[string]interface{})
+		var subStorage map[string]interface{}
 		var ok bool
 		if index < len(rawSlice) {
 			subStorage, ok = rawSlice[index].(map[string]interface{})
 			if !ok {
-				return ErrHandle
+				subStorage = make(map[string]interface{})
+				// base value
+				subStorage[fmt.Sprintf("%d", index)] = rawSlice[index]
 			}
 		}
 		// Make internal handler for one record
@@ -109,6 +111,7 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 		for _, tag := range supportedTags {
 			if _, ok = handler.fieldTags[tag]; ok {
 				fieldKey = tag
+				break
 			}
 		}
 
@@ -129,9 +132,9 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 		}
 		handler.child = append(handler.child, subHandler)
 		if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
-			handler.reflectValue.Index(index).Set(subHandler.reflectValue.Addr())
+			sliceValueOf.Index(index).Set(subHandler.reflectValue.Addr())
 		} else {
-			handler.reflectValue.Index(index).Set(subHandler.reflectValue)
+			sliceValueOf.Index(index).Set(subHandler.reflectValue)
 		}
 	}
 	//
