@@ -23,7 +23,9 @@ func (c *Configurator) handleMap(handler *Handler) (err error) {
 				// Creating internal storage for handler
 				subStorage, ok := value.(map[string]interface{})
 				if !ok {
-					return ErrHandle
+					subStorage = make(map[string]interface{})
+					// base value
+					subStorage[key] = value
 				}
 				// Make internal handler for one record
 				var fieldKey string
@@ -47,7 +49,12 @@ func (c *Configurator) handleMap(handler *Handler) (err error) {
 				if err = c.handle(subHandler); err != nil {
 					return err
 				}
-				mapValue.SetMapIndex(reflect.ValueOf(key), subHandler.reflectValue.Addr())
+
+				if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
+					mapValue.SetMapIndex(reflect.ValueOf(key), subHandler.reflectValue.Addr())
+				} else {
+					mapValue.SetMapIndex(reflect.ValueOf(key), subHandler.reflectValue)
+				}
 			default:
 			}
 		}

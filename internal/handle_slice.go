@@ -62,9 +62,19 @@ func (c *Configurator) handleBytesSlice(handler *Handler) (err error) {
 func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 
 	var rawSlice []interface{}
+	var rawStorage map[string]interface{}
 	for _, value := range handler.fieldTags {
 		if storage, ok := handler.parent.storage[value]; ok {
-			rawSlice = storage.([]interface{})
+			// Base key
+			switch storage.(type) {
+			case []interface{}:
+				rawSlice = storage.([]interface{})
+			case map[string]interface{}:
+				rawStorage = storage.(map[string]interface{})
+				rawSlice = make([]interface{}, len(rawStorage))
+			default:
+				return errors.Wrap(ErrHandle, "handleCommonSlice: convert rawSlice")
+			}
 			break
 		}
 	}
@@ -99,11 +109,15 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 		var subStorage map[string]interface{}
 		var ok bool
 		if index < len(rawSlice) {
-			subStorage, ok = rawSlice[index].(map[string]interface{})
-			if !ok {
-				subStorage = make(map[string]interface{})
-				// base value
-				subStorage[fmt.Sprintf("%d", index)] = rawSlice[index]
+			if rawStorage != nil {
+				subStorage = rawStorage
+			} else {
+				subStorage, ok = rawSlice[index].(map[string]interface{})
+				if !ok {
+					subStorage = make(map[string]interface{})
+					// base value
+					subStorage[fmt.Sprintf("%d", index)] = rawSlice[index]
+				}
 			}
 		}
 		// Make internal handler for one record

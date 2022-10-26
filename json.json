@@ -14,12 +14,14 @@
         "map_type_2": {
           "key": ["strings"]
         },
-        "map_type_3": {
-          "key": {
-            "int": 1,
-            "string": "string"
+        "map_type_3": [
+            {
+              "key": {
+              "int": 1,
+              "string": "string"
+            }
           }
-        }
+        ]
       }
     ]
   }
