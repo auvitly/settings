@@ -16,11 +16,13 @@
         },
         "map_type_3": [
             {
-              "key": {
-              "int": 1,
-              "string": "string"
+              "slice": [
+                {
+                  "int": 1,
+                  "string": "string"
+                }
+              ]
             }
-          }
         ]
       }
     ]
