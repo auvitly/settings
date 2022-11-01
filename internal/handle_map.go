@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"reflect"
+	"settings/types"
 )
 
 func (c *Configurator) handleMap(handler *Handler) (err error) {
@@ -15,8 +16,8 @@ func (c *Configurator) handleMap(handler *Handler) (err error) {
 		return err
 	}
 
-	switch c.options[ProcessingMode] {
-	case ComplementMode:
+	switch c.options[types.ProcessingMode] {
+	case types.ComplementMode:
 		if !handler.reflectValue.IsNil() {
 			mapValue = handler.reflectValue
 		} else {
@@ -26,7 +27,7 @@ func (c *Configurator) handleMap(handler *Handler) (err error) {
 			)
 			mapValue = reflect.MakeMapWithSize(mapType, 0)
 		}
-	case OverwritingMode:
+	case types.OverwritingMode:
 		// Creating internal map
 		mapType = reflect.MapOf(
 			handler.reflectType.Key(),

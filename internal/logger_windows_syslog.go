@@ -5,12 +5,13 @@ package internal
 
 import (
 	"github.com/sirupsen/logrus"
+	"settings/types"
 )
 
 type SyslogLevel int
 
 // syslogHook создает пустой хук для сислога (на самом деле нет)
-func syslogHook(loggerSettings Logger) (hook logrus.Hook, err error) {
+func syslogHook(loggerSettings types.Logger) (hook logrus.Hook, err error) {
 	return
 }
 

@@ -8,14 +8,14 @@ const defaultFileName = "config"
 const (
 	urlType    = "url.URL"
 	timeType   = "time.Time"
-	loggerType = "internal.Logger"
+	loggerType = "types.Logger"
 )
 
 // Based on general types
 const (
 	durationType    = "time.Duration"
 	logrusLevelType = "logrus.Level"
-	syslogLevelType = "internal.SyslogLevel"
+	syslogLevelType = "types.SyslogLevel"
 )
 
 // Supported tags

@@ -2,55 +2,37 @@ package internal
 
 import (
 	"github.com/sirupsen/logrus"
+	"settings/types"
 	"time"
 )
 
-type Options string
-
-// IOptions - options interface
-type IOptions interface{}
-
-// General option types
-const (
-	TimeFormat     Options = "time_format"
-	ProcessingMode Options = "processing_mode"
-	LoggerHook     Options = "logger_hook"
-	LoggerInstance Options = "logger_instance"
-)
-
-// ProcessingMode
-const (
-	OverwritingMode string = "overwriting"
-	ComplementMode  string = "complement"
-)
-
-func (c *Configurator) SetOption(options IOptions, value interface{}) error {
+func (c *Configurator) SetOption(options types.Options, value interface{}) error {
 
 	switch options {
-	case TimeFormat:
+	case types.TimeFormat:
 		format, ok := value.(string)
 		if !ok {
 			return ErrInvalidOptions
 		}
-		c.options[TimeFormat] = format
-	case ProcessingMode:
+		c.options[types.TimeFormat] = format
+	case types.ProcessingMode:
 		mode, ok := value.(string)
 		if !ok {
 			return ErrInvalidOptions
 		}
-		c.options[ProcessingMode] = mode
-	case LoggerHook:
+		c.options[types.ProcessingMode] = mode
+	case types.LoggerHook:
 		enable, ok := value.(bool)
 		if !ok {
 			return ErrInvalidOptions
 		}
-		c.options[LoggerHook] = enable
-	case LoggerInstance:
+		c.options[types.LoggerHook] = enable
+	case types.LoggerInstance:
 		logger, ok := value.(*logrus.Logger)
 		if !ok {
 			return ErrInvalidOptions
 		}
-		c.options[LoggerHook] = logger
+		c.options[types.LoggerHook] = logger
 	default:
 		return ErrInvalidOptionsType
 	}
@@ -61,27 +43,27 @@ func (c *Configurator) SetOption(options IOptions, value interface{}) error {
 
 func (c *Configurator) setDefaultOptions() {
 	// Time format
-	c.options[TimeFormat] = time.RFC3339
+	c.options[types.TimeFormat] = time.RFC3339
 	// Processing mode
-	c.options[ProcessingMode] = OverwritingMode
+	c.options[types.ProcessingMode] = types.OverwritingMode
 	// Logger hook
-	c.options[LoggerHook] = false
+	c.options[types.LoggerHook] = false
 	// Logger
-	c.options[LoggerInstance] = logrus.StandardLogger()
+	c.options[types.LoggerInstance] = logrus.StandardLogger()
 }
 
 func (c *Configurator) getTimeFormat() string {
-	return c.options[TimeFormat].(string)
+	return c.options[types.TimeFormat].(string)
 }
 
 func (c *Configurator) getProcessingMode() string {
-	return c.options[ProcessingMode].(string)
+	return c.options[types.ProcessingMode].(string)
 }
 
 func (c *Configurator) getLoggerHook() bool {
-	return c.options[LoggerHook].(bool)
+	return c.options[types.LoggerHook].(bool)
 }
 
 func (c *Configurator) getLogger() *logrus.Logger {
-	return c.options[LoggerInstance].(*logrus.Logger)
+	return c.options[types.LoggerInstance].(*logrus.Logger)
 }

@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"settings/types"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func (c *Configurator) handleStruct(handler *Handler) (err error) {
 	}
 
 	if handler.reflectType.String() == loggerType {
-		if c.options[LoggerHook].(bool) {
+		if c.options[types.LoggerHook].(bool) {
 			if configuration, ok := handler.reflectValue.Interface().(Logger); ok {
 				c.configureLogger(configuration)
 			}
@@ -125,7 +126,7 @@ func (c *Configurator) handleTime(h *Handler) (err error) {
 		}
 	}
 	if len(rawTime) != 0 {
-		opt, ok := c.options[TimeFormat].(string)
+		opt, ok := c.options[types.TimeFormat].(string)
 		if !ok {
 			return ErrInvalidOptions
 		}

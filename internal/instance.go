@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
+	"settings/types"
 )
 
 type Configurator struct {
@@ -14,18 +15,18 @@ type Configurator struct {
 	filePaths []string
 	viper     *viper.Viper
 	config    map[string]interface{}
-	options   map[Options]interface{}
+	options   map[types.Options]interface{}
 	validator *validator.Validate
 }
 
-func New(name string, path string) *Configurator {
+func New(name string, paths ...string) *Configurator {
 
 	c := &Configurator{
 		logger:    logrus.StandardLogger(),
 		fileName:  name,
 		filePaths: defaultPaths,
 		viper:     viper.New(),
-		options:   make(map[Options]interface{}),
+		options:   make(map[types.Options]interface{}),
 		validator: validator.New(),
 	}
 
@@ -36,8 +37,8 @@ func New(name string, path string) *Configurator {
 	}
 
 	// add path
-	if len(path) != 0 {
-		c.filePaths = append(c.filePaths, path)
+	if len(paths) != 0 {
+		c.filePaths = append(c.filePaths, paths...)
 	}
 
 	// if the filename is omitted, then use the default filename
@@ -46,7 +47,7 @@ func New(name string, path string) *Configurator {
 	}
 
 	// add base file paths
-	for _, path = range c.filePaths {
+	for _, path := range c.filePaths {
 		c.viper.AddConfigPath(path)
 	}
 
@@ -106,8 +107,4 @@ func (c *Configurator) GetViper() (*viper.Viper, error) {
 	} else {
 		return nil, errors.New("viper not found")
 	}
-}
-
-func (c *Configurator) AddFilePaths(paths ...string) {
-	c.filePaths = append(c.filePaths, paths...)
 }

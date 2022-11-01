@@ -14,7 +14,7 @@ import (
 type SyslogLevel = syslog.Priority
 
 // syslogHook создает хук для сислога
-func syslogHook(loggerSettings Logger) (logrus.Hook, error) {
+func syslogHook(loggerSettings types.Logger) (logrus.Hook, error) {
 
 	switch loggerSettings.SyslogProtocol {
 	case "udp", "tcp":

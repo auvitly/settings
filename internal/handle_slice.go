@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"reflect"
+	"settings/types"
 )
 
 func (c *Configurator) handleSlice(handler *Handler) (err error) {
@@ -97,8 +98,8 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 	)
 
 	sliceTypeOf = reflect.SliceOf(handler.reflectValue.Type().Elem())
-	switch c.options[ProcessingMode] {
-	case ComplementMode:
+	switch c.options[types.ProcessingMode] {
+	case types.ComplementMode:
 		switch handler.reflectValue.Len() {
 		case 0:
 			sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
@@ -115,7 +116,7 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 			}
 			sliceValueOf = handler.reflectValue
 		}
-	case OverwritingMode:
+	case types.OverwritingMode:
 		sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
 	}
 
