@@ -5,8 +5,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
-	"reflect"
-	"time"
 )
 
 type Configurator struct {
@@ -88,34 +86,15 @@ func (c *Configurator) LoadConfiguration() error {
 func (c *Configurator) Unmarshal(config interface{}) error {
 
 	if root, err := c.newRootHandler(config); err != nil {
+		if err = c.validator.Struct(root.reflectValue.Interface()); err != nil {
+			return err
+		}
 		return err
 	} else {
 		if err = c.handle(root); err != nil {
-			root.reflectValue.Set(reflect.Zero(reflect.TypeOf(config).Elem()))
 			return err
 		}
 		return nil
 	}
-
-}
-
-func (c *Configurator) setDefaultOptions() {
-	// Time format
-	c.options[TimeFormat] = time.RFC3339
-
-}
-
-func (c *Configurator) SetOption(options Options, value interface{}) error {
-
-	switch options {
-	case TimeFormat:
-		format, ok := value.(string)
-		if !ok {
-			return ErrInvalidOptions
-		}
-		c.options[TimeFormat] = format
-	}
-
-	return nil
 
 }

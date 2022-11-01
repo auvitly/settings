@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/gemnasium/logrus-graylog-hook v2.0.7+incompatible
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/kaatinga/const-errs v1.0.0
 	github.com/pkg/errors v0.9.1

@@ -1,0 +1,67 @@
+{
+  "base":  {
+    "numbers": {
+      "int": 9223372036854770000,
+      "int8": 127,
+      "int16": 32767,
+      "int32": 2147483647,
+      "int64": 9223372036854775000,
+      "uint": 9223372036854775000,
+      "uint8": 255,
+      "uint16": 65535,
+      "uint32": 4294967295,
+      "uint64": 9223372036854775000,
+      "float32": 9223372036854775000,
+      "float64": 9223372036854775000
+    },
+    "strings": {
+      "string": "string"
+    },
+    "slices": {
+      "strings_slice": ["string_1", "string_2"],
+      "bytes_slice": "hello",
+      "map_slice": [{
+        "key": 255
+      }],
+      "struct_slice": [{
+        "field_1": 255
+      }]
+    },
+    "maps": {
+      "map_int": {
+        "key": 255
+      },
+      "map_string": {
+        "key": "string"
+      },
+      "map_slice_string": {
+        "key": ["string_1", "string_2"]
+      },
+      "map_map_int": {
+        "map_int": {
+          "key": 255
+        }
+      },
+      "map_struct": {
+        "key": {
+          "field_1": 255
+        }
+      }
+    }
+  },
+  "optional": {
+    "time": "2006-01-02T15:04:05Z",
+    "dur": "1m",
+    "url": "https://google.ru"
+  },
+  "logger": {
+    "level": "debug",
+    "syslog_addr": "127.0.0.1:514",
+    "syslog_protocol": "udp",
+    "syslog_level": "debug",
+    "colour": false,
+    "stdout": true,
+    "graylog_level": "debug",
+    "graylog": "graylog:514"
+  }
+}

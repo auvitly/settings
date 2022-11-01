@@ -8,19 +8,18 @@ import (
 
 func (c *Configurator) handleSlice(handler *Handler) (err error) {
 
-	switch handler.reflectValue.Kind() {
-	case reflect.Slice:
-		var isByteSlice bool
-		if isByteSlice, err = c.checkByteSlice(handler); err != nil {
-			return err
-		}
-		if isByteSlice {
-			return c.handleBytesSlice(handler)
-		}
-		return c.handleCommonSlice(handler)
-	default:
-		return ErrHandle
+	if err = c.checkUnsupportedSliceTags(handler); err != nil {
+		return err
 	}
+
+	var isByteSlice bool
+	if isByteSlice, err = c.checkByteSlice(handler); err != nil {
+		return err
+	}
+	if isByteSlice {
+		return c.handleBytesSlice(handler)
+	}
+	return c.handleCommonSlice(handler)
 
 }
 
@@ -49,11 +48,28 @@ func (c *Configurator) checkByteSlice(handler *Handler) (result bool, err error)
 	return false, nil
 }
 
+func (c *Configurator) checkUnsupportedSliceTags(handler *Handler) (err error) {
+	var ok bool
+	if _, ok = handler.fieldTags[env]; ok {
+		return errors.Wrapf(ErrUnsupportedFieldTag, fmt.Sprintf("field %s -> %s; field_name: %s",
+			env, handler.obtainHandlerName(env), handler.name))
+	}
+	if _, ok = handler.fieldTags[defaultValue]; ok {
+		return errors.Wrapf(ErrUnsupportedFieldTag, fmt.Sprintf("field %s -> %s; field_name: %s",
+			defaultValue, handler.obtainHandlerName(defaultValue), handler.name))
+	}
+	return
+}
+
 func (c *Configurator) handleBytesSlice(handler *Handler) (err error) {
 
-	for _, value := range handler.parent.storage {
-		str := value.(string)
-		handler.reflectValue.SetBytes([]byte(str))
+	for tag, value := range handler.parent.storage {
+		for _, key := range handler.fieldTags {
+			if tag == key {
+				str := value.(string)
+				handler.reflectValue.SetBytes([]byte(str))
+			}
+		}
 	}
 
 	return err
@@ -65,15 +81,11 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 	var rawStorage map[string]interface{}
 	for _, value := range handler.fieldTags {
 		if storage, ok := handler.parent.storage[value]; ok {
-			// Base key
 			switch storage.(type) {
 			case []interface{}:
 				rawSlice = storage.([]interface{})
-			case map[string]interface{}:
-				rawStorage = storage.(map[string]interface{})
-				rawSlice = make([]interface{}, len(rawStorage))
 			default:
-				return errors.Wrap(ErrHandle, "handleCommonSlice: convert rawSlice")
+				return errors.Wrap(ErrProcessing, "")
 			}
 			break
 		}
@@ -85,21 +97,26 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 	)
 
 	sliceTypeOf = reflect.SliceOf(handler.reflectValue.Type().Elem())
-	switch handler.reflectValue.Len() {
-	case 0:
-		sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
-	case len(rawSlice):
-		sliceValueOf = handler.reflectValue
-	default:
-		length := handler.reflectValue.Len()
-		for i := length; length < len(rawSlice); i++ {
-			if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
-				handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem().Addr())
-			} else {
-				handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem())
+	switch c.options[ProcessingMode] {
+	case ComplementMode:
+		switch handler.reflectValue.Len() {
+		case 0:
+			sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
+		case len(rawSlice):
+			sliceValueOf = handler.reflectValue
+		default:
+			length := handler.reflectValue.Len()
+			for i := length; length < len(rawSlice); i++ {
+				if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
+					handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem().Addr())
+				} else {
+					handler.reflectValue = reflect.Append(handler.reflectValue, reflect.New(sliceTypeOf.Elem()).Elem())
+				}
 			}
+			sliceValueOf = handler.reflectValue
 		}
-		sliceValueOf = handler.reflectValue
+	case OverwritingMode:
+		sliceValueOf = reflect.MakeSlice(sliceTypeOf, len(rawSlice), len(rawSlice))
 	}
 
 	length := sliceValueOf.Len()
@@ -120,6 +137,7 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 				}
 			}
 		}
+
 		// Make internal handler for one record
 		var fieldKey string
 		for _, tag := range supportedTags {
@@ -129,6 +147,7 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 			}
 		}
 
+		// Make sub handler for item of slice
 		subHandler := &Handler{
 			name:           fmt.Sprintf("%d", index),
 			storage:        subStorage,
@@ -151,41 +170,6 @@ func (c *Configurator) handleCommonSlice(handler *Handler) (err error) {
 			sliceValueOf.Index(index).Set(subHandler.reflectValue)
 		}
 	}
-	//
-	//for index, value := range rawSlice {
-	//	// Creating internal storage for handler
-	//	subStorage, ok := value.(map[string]interface{})
-	//	if !ok {
-	//		return ErrHandle
-	//	}
-	//	// Make internal handler for one record
-	//	var fieldKey string
-	//	for _, tag := range supportedTags {
-	//		if _, ok = handler.fieldTags[tag]; ok {
-	//			fieldKey = tag
-	//		}
-	//	}
-	//	subHandler := &Handler{
-	//		name:           fmt.Sprintf("%d", index),
-	//		storage:        subStorage,
-	//		reflectValue:   reflect.New(sliceTypeOf.Elem()).Elem(),
-	//		reflectType:    reflect.New(sliceTypeOf.Elem()).Elem().Type(),
-	//		structureField: reflect.StructField{},
-	//		child:          make([]*Handler, 0),
-	//		parent:         handler,
-	//		fieldTags:      Tags{fieldKey: fmt.Sprintf("%d", index)},
-	//		loadValues:     make(LoadValues),
-	//		validator:      handler.validator,
-	//	}
-	//	if err = c.handle(subHandler); err != nil {
-	//		return err
-	//	}
-	//	if handler.reflectValue.Type().Elem().Kind() == reflect.Pointer {
-	//		handler.reflectValue.Index(index).Set(subHandler.reflectValue.Addr())
-	//	} else {
-	//		handler.reflectValue.Index(index).Set(subHandler.reflectValue)
-	//	}
-	//}
 	handler.reflectValue.Set(sliceValueOf)
 	return
 }

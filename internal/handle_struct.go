@@ -10,10 +10,6 @@ import (
 
 func (c *Configurator) handleStruct(handler *Handler) (err error) {
 
-	if err = c.validator.Struct(handler.reflectValue.Interface()); err != nil {
-		return err
-	}
-
 	num := handler.reflectType.NumField()
 	for i := 0; i < num; i++ {
 		handler.parseStructField(i)
@@ -35,9 +31,18 @@ func (c *Configurator) handleStruct(handler *Handler) (err error) {
 				}
 			}
 		default:
-			err = ErrHandle
+			err = ErrProcessing
 		}
 	}
+
+	if handler.reflectType.String() == loggerType {
+		if c.options[LoggerHook].(bool) {
+			if configuration, ok := handler.reflectValue.Interface().(Logger); ok {
+				c.configureLogger(configuration)
+			}
+		}
+	}
+
 	return
 }
 
@@ -128,7 +133,16 @@ func (c *Configurator) handleTime(h *Handler) (err error) {
 		if err != nil {
 			return errors.Wrapf(err, "value: %v", h.obtainHandlerName(tag))
 		}
-		h.reflectValue.Set(reflect.ValueOf(time).Elem())
+		h.reflectValue.Set(reflect.ValueOf(time))
 	}
 	return err
+}
+
+func (c *Configurator) handleLogger(h *Handler) (err error) {
+
+	if err = c.handle(h); err != nil {
+		return err
+	}
+
+	return nil
 }

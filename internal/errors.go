@@ -12,9 +12,12 @@ const (
 	ErrNotAStruct           cer.Error = "the configuration must be a struct"
 	ErrNotAddressable       cer.Error = "the main struct must be pointed out via pointer"
 	ErrNotAddressableField  cer.Error = "the value is not addressable"
-	ErrHandle               cer.Error = "unknown error"
+	ErrProcessing           cer.Error = "processing error"
 	ErrBaseTypeNotMatch     cer.Error = "types not match"
 	ErrInvalidOptions       cer.Error = "invalid value options"
+	ErrInvalidOptionsType   cer.Error = "invalid options type"
+	ErrExceedingExpectValue cer.Error = "exceeding the expected value"
+	ErrUnsupportedFieldTag  cer.Error = "unsupported tag"
 )
 
 func errBaserTypeNotMatch(tag, outType, foundedType string) error {
