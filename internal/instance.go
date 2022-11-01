@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
@@ -97,4 +98,16 @@ func (c *Configurator) Unmarshal(config interface{}) error {
 		return nil
 	}
 
+}
+
+func (c *Configurator) GetViper() (*viper.Viper, error) {
+	if c.viper != nil {
+		return c.viper, nil
+	} else {
+		return nil, errors.New("viper not found")
+	}
+}
+
+func (c *Configurator) AddFilePaths(paths ...string) {
+	c.filePaths = append(c.filePaths, paths...)
 }

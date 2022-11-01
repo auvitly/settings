@@ -7,6 +7,9 @@ import (
 
 type Options string
 
+// IOptions - options interface
+type IOptions interface{}
+
 // General option types
 const (
 	TimeFormat     Options = "time_format"
@@ -21,7 +24,7 @@ const (
 	ComplementMode  string = "complement"
 )
 
-func (c *Configurator) SetOption(options Options, value interface{}) error {
+func (c *Configurator) SetOption(options IOptions, value interface{}) error {
 
 	switch options {
 	case TimeFormat:
