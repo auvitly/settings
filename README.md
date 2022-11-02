@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img alt="golangci-lint logo" src="https://cdn-icons-png.flaticon.com/512/3732/3732882.png" height="150" />
+  <img alt="golangci-lint logo" src="https://cdn-icons-png.flaticon.com/512/3281/3281345.png" height="150" />
   <h3 align="center">settings</h3>
   <p align="center">Settings Loader</p>
 </p>
