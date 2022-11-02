@@ -26,11 +26,6 @@ func LoadSettings(settings interface{}, v *viper.Viper) error {
 	return configurator.LoadSettings(settings)
 }
 
-// ReadOptions - загрузка viper из внешнего reader
-func ReadOptions(config io.Reader) error {
-	return configurator.ReadOptions(config)
-}
-
 // SetOption - настройка конфигуратора
 func SetOption(options types.Options, value interface{}) error {
 	return configurator.SetOption(options, value)
