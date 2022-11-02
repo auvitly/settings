@@ -1,10 +1,11 @@
 ## Оглавление
-1. [Описание](#Описание)
-2. [Файлы конфигурации](#Файлы конфигурации)
-3. [Поддерживаемые типы](#Поддерживаемые типы)
+1. [Описание](#desc)
+2. [Файлы конфигурации](#files)
+3. [Поддерживаемые типы](#types)
 
 ---
 
+<a name="desc"></a>
 ### 1. Описание
 
 Для парсинга файлов используется библиотека [`viper`](https://github.com/spf13/viper).
@@ -180,7 +181,7 @@ type Main struct {
 
 ```go
 type Settings struct {
-    StructMustBeOmitted   *MyStruct `omit:""`
+    StructMustBeOmitted   *MyStruct `omit:"-"`
 }
 ```
 <a name="validate"></a>
@@ -189,5 +190,7 @@ type Settings struct {
 [validator](https://github.com/go-playground/validator).
 
 ### Файлы конфигурации
+<a name="files"></a>
 
 ### Поддерживаемые типы
+<a name="types"></a>
