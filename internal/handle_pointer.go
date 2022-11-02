@@ -1,7 +1,8 @@
 package internal
 
 func (c *Configurator) handlePointer(handler *Handler) (err error) {
-	if _, ok := handler.loadValues[omit]; ok {
+
+	if _, ok := handler.fieldTags[omit]; ok {
 		return err
 	}
 	if err = handler.pointerFill(); err != nil {

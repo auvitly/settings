@@ -3,6 +3,12 @@
 
 package types
 
+import (
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"strings"
+)
+
 type Logger struct {
 	LogLevel       logrus.Level `env:"LOG_LEVEL" toml:"level" json:"level" xml:"level" yaml:"level" default:"debug"`
 	Syslog         string       `env:"SYSLOG" toml:"syslog_addr" json:"syslog_addr" xml:"syslog_addr" yaml:"syslog_addr" default:"127.0.0.1:514" validate:"tcp_addr"`

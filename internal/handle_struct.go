@@ -38,7 +38,7 @@ func (c *Configurator) handleStruct(handler *Handler) (err error) {
 
 	if handler.reflectType.String() == loggerType {
 		if c.options[types.LoggerHook].(bool) {
-			if configuration, ok := handler.reflectValue.Interface().(Logger); ok {
+			if configuration, ok := handler.reflectValue.Interface().(types.Logger); ok {
 				c.configureLogger(configuration)
 			}
 		}

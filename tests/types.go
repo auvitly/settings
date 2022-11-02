@@ -2,6 +2,7 @@ package tests
 
 import (
 	"net/url"
+	"settings/types"
 	"time"
 )
 
@@ -63,24 +64,6 @@ type Config struct {
 		Url     url.URL        `json:"url"`
 		PtrUrl  *url.URL       `json:"url"`
 	} `json:"optional"`
-	Logger struct {
-		Level          string `json:"level"`
-		SyslogAddr     string `json:"syslog_addr"`
-		SyslogProtocol string `json:"syslog_protocol"`
-		SyslogLevel    string `json:"syslog_level"`
-		Colour         bool   `json:"colour"`
-		Stdout         bool   `json:"stdout"`
-		GraylogLevel   string `json:"graylog_level"`
-		Graylog        string `json:"graylog"`
-	} `json:"logger"`
-	PtrLogger *struct {
-		Level          string `json:"level"`
-		SyslogAddr     string `json:"syslog_addr"`
-		SyslogProtocol string `json:"syslog_protocol"`
-		SyslogLevel    string `json:"syslog_level"`
-		Colour         bool   `json:"colour"`
-		Stdout         bool   `json:"stdout"`
-		GraylogLevel   string `json:"graylog_level"`
-		Graylog        string `json:"graylog"`
-	} `json:"logger"`
+	Logger    types.Logger  `json:"logger"`
+	PtrLogger *types.Logger `json:"logger" omit:"-"`
 }
