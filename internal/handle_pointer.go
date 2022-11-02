@@ -1,9 +1,11 @@
 package internal
 
 func (c *Configurator) handlePointer(handler *Handler) (err error) {
-	err = handler.pointerFill()
-	if err != nil {
-		return
+	if _, ok := handler.loadValues[omit]; ok {
+		return err
+	}
+	if err = handler.pointerFill(); err != nil {
+		return err
 	}
 	return c.handle(handler)
 }

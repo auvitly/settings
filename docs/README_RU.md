@@ -2,6 +2,7 @@
 1. [Описание](#desc)
 2. [Файлы конфигурации](#files)
 3. [Поддерживаемые типы](#types)
+4. [Примеры](#examples)
 
 ---
 
@@ -27,7 +28,7 @@ LoadOptions(name string, paths ...string) (*viper.Viper, error)
 LoadSettings(settings interface{}, v *viper.Viper) error
 ````
 
-Данный способ под капотом также устанавливает хук на syslog, если используется [стандартная модель](../types/logger_unix_syslog.go) настроек:
+Данный способ также устанавливает хук на syslog, если используется [стандартная модель](../types/logger_unix_syslog.go) настроек логгера:
 
 ```go
 type Logger struct {
@@ -194,3 +195,6 @@ type Settings struct {
 
 ### Поддерживаемые типы
 <a name="types"></a>
+
+### Примеры
+<a name="examples"></a>
