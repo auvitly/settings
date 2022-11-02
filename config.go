@@ -7,24 +7,7 @@ import (
 	"settings/types"
 )
 
-// New realisation
-
-type IConfigurator interface {
-	// ReadConfiguration - загрузка viper из внешнего reader
-	ReadConfiguration(config io.Reader) error
-	// LoadConfiguration - загрузка загрузить viper из файла, который был установлен при создании конфигуратора
-	LoadConfiguration() error
-	// Unmarshal - установка значения из viper в структуру, указатель на которую передается в качестве аргумента
-	Unmarshal(config interface{}) error
-	// SetOption - настройка конфигуратора
-	SetOption(options types.Options, value interface{}) error
-}
-
-func New(name string, paths ...string) IConfigurator {
-	return internal.New(name, paths...)
-}
-
-// Old realisation
+// General
 
 var configurator *internal.Configurator
 
@@ -32,7 +15,7 @@ var configurator *internal.Configurator
 func LoadOptions(name string, paths ...string) (*viper.Viper, error) {
 	configurator = internal.New(name, paths...)
 	configurator.SetOption(types.LoggerHook, true)
-	if err := configurator.LoadConfiguration(); err != nil {
+	if err := configurator.LoadOptions(); err != nil {
 		return nil, err
 	}
 	return configurator.Viper, nil
@@ -40,5 +23,32 @@ func LoadOptions(name string, paths ...string) (*viper.Viper, error) {
 
 // LoadSettings - установка значения из viper в структуру, указатель на которую передается в качестве аргумента
 func LoadSettings(settings interface{}, v *viper.Viper) error {
-	return configurator.Unmarshal(settings)
+	return configurator.LoadSettings(settings)
+}
+
+// ReadOptions - загрузка viper из внешнего reader
+func ReadOptions(config io.Reader) error {
+	return configurator.ReadOptions(config)
+}
+
+// SetOption - настройка конфигуратора
+func SetOption(options types.Options, value interface{}) error {
+	return configurator.SetOption(options, value)
+}
+
+// New realisation
+
+type IConfigurator interface {
+	// ReadOptions - загрузка viper из внешнего reader
+	ReadOptions(config io.Reader) error
+	// LoadOptions - загрузка viper из файла, который был установлен при создании конфигуратора
+	LoadOptions() error
+	// LoadSettings - установка значения из viper в структуру, указатель на которую передается в качестве аргумента
+	LoadSettings(config interface{}) error
+	// SetOption - настройка конфигуратора
+	SetOption(options types.Options, value interface{}) error
+}
+
+func New(name string, paths ...string) IConfigurator {
+	return internal.New(name, paths...)
 }

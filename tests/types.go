@@ -10,7 +10,7 @@ type Config struct {
 	Base struct {
 		Numbers struct {
 			Int        int      `json:"int"`
-			PtrInt     *int     `json:"int"`
+			PtrInt     *int     `json:"int" omit:""`
 			Int8       int8     `json:"int8"`
 			PtrInt8    *int8    `json:"int8"`
 			Int16      int16    `json:"int16"`
@@ -65,5 +65,5 @@ type Config struct {
 		PtrUrl  *url.URL       `json:"url"`
 	} `json:"optional"`
 	Logger    types.Logger  `json:"logger"`
-	PtrLogger *types.Logger `json:"logger" omit:"-"`
+	PtrLogger *types.Logger `json:"logger" omit:""`
 }

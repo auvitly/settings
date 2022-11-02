@@ -6,6 +6,10 @@ import (
 
 func (c *Configurator) handle(handler *Handler) (err error) {
 
+	if _, ok := handler.fieldTags[omit]; ok {
+		return err
+	}
+
 	kind := handler.reflectValue.Kind()
 	switch kind {
 	case reflect.Pointer:

@@ -8,13 +8,13 @@ import (
 
 func TestBaseTypes(t *testing.T) {
 
-	c := config.New("config_json", "./configs/")
+	c := config.New("config_json.json", "./configs/")
 
 	conf := &Config{}
 
-	c.LoadConfiguration()
+	c.LoadOptions()
 
-	err := c.Unmarshal(conf)
+	err := c.LoadSettings(conf)
 
 	logrus.Info(err)
 }

@@ -97,8 +97,8 @@ func (h *Handler) parseStructField(index int) {
 
 	// Searching for tags from the list of allowed tags
 	for _, tag := range supportedTags {
-		if len(handler.structureField.Tag.Get(tag)) != 0 {
-			handler.fieldTags[tag] = handler.structureField.Tag.Get(tag)
+		if value, ok := handler.structureField.Tag.Lookup(tag); ok {
+			handler.fieldTags[tag] = value
 		}
 		switch handler.parent.storage[handler.fieldTags[tag]].(type) {
 		case map[string]interface{}:

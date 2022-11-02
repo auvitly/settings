@@ -1,34 +1,35 @@
 ## Оглавление
 1. [Описание](#desc)
-2. [Файлы конфигурации](#files)
-3. [Поддерживаемые типы](#types)
-4. [Примеры](#examples)
+2. [Поддерживаемые типы](#types)
 
 ---
 
 <a name="desc"></a>
 ### 1. Описание
 
-Для парсинга файлов используется библиотека [`viper`](https://github.com/spf13/viper).
+Пакет предназначен для организации загрузки конфигурации. Пакет работает с переменными средами - _ENV_,
+файлами форматов _JSON, TOML, YAML_ и прочими форматами, поддерживаемыми пакетом [viper](https://github.com/spf13/viper).
 
-Существует два метода использования данного пакета: 
-* базовый метод загрузки;
-* через сущность конфигуратора.
+
 
 <hr>
 
-#### 1.1 Базовый метод загрузки настроек
+#### 1.1 Базовый метод работы
 
-Первый вариант довольно прост и имеет в себе всего две функции:
+Базовый вариант предполагает работу с глобальной сущностью пакета. Обращение к сущности происходит через 4 метода:
 
 ````go
+// ReadOptions - загрузка viper из внешнего reader
+ReadOptions(config io.Reader) error 
 // LoadOptions - функция загрузки настроек из файла
 LoadOptions(name string, paths ...string) (*viper.Viper, error)
 // LoadSettings - функция установки значений в структуру
 LoadSettings(settings interface{}, v *viper.Viper) error
+// SetOption - настройка конфигуратора
+SetOption(options types.Options, value interface{}) error
 ````
 
-Данный способ также устанавливает хук на syslog, если используется [стандартная модель](../types/logger_unix_syslog.go) настроек логгера:
+Данный способ по умолчанию устанавливает хук на syslog, если используется [стандартная структура настроек логгера](../types/logger_unix_syslog.go):
 
 ```go
 type Logger struct {
@@ -44,23 +45,24 @@ type Logger struct {
 ```
 
 #### 1.2 Конфигуратор
-Данный способ имеет сравнительно больше возможностей, что позволяет выполнять тонкую настройку загрузки настроек. 
-Конфигуратор определен интерфейсом IConfigurator:
+
+Конфигуратор - отдельная сущность, для работы с выделенным файлом или io.Reader и определен интерфейсом **IConfigurator**:
 
 ```go
 type IConfigurator interface {
-	// ReadConfiguration - загрузка viper из внешнего io.Reader
-	ReadConfiguration(config io.Reader) error
-	// LoadConfiguration - загрузка загрузить viper из файла, который был установлен при создании конфигуратора
-	LoadConfiguration() error
-	// Unmarshal - установка значения из viper в структуру, указатель на которую передается в качестве аргумента
-	Unmarshal(config interface{}) error
+	// ReadOptions - загрузка viper из внешнего io.Reader
+	ReadOptions(config io.Reader) error
+	// LoadOptions - загрузка загрузить viper из файла, который был установлен при создании конфигуратора
+	LoadOptions() error
+	// LoadSettings - установка значения из viper в структуру, указатель на которую передается в качестве аргумента
+	LoadSettings(config interface{}) error
 	// SetOption - настройка конфигуратора
 	SetOption(options types.Options, value interface{}) error
 }
 
 ```
-Конфигуратор может получить viper как из файла, так из иного io.Reader. Рассмотрим методику работы с конфигуратором.
+
+Для загрузки настроек через конфигуратор:
 
 ```go
 func main() {
@@ -69,17 +71,19 @@ func main() {
 	// Инициализация конфигуратора
 	configurator = config.New("filename", "path")
 	// Загружаем конфигурацию из файла
-	if err := configurator.LoadConfiguration(); err != nil {
+	if err := configurator.LoadOptions(); err != nil {
 	    logrus.WithError(err).Panic("Unable to load configuration")	
         }
 	// Выгружаем конфигурацию в структуру
-	if err := configurator.Unmarshal(config); err != nil {
+	if err := configurator.LoadSettings(config); err != nil {
             logrus.WithError(err).Panic("Unable to unmarshal configuration")
         }
 }
 ```
 
-Тонкая настройка подразумевает следующий набор возможностей:
+#### 1.3 Настройка
+
+Настройка подразумевает следующий набор возможностей:
 
 | Option                 | Type           | Description                                                                       |
 |------------------------|----------------|-----------------------------------------------------------------------------------|
@@ -89,7 +93,19 @@ func main() {
 | ```LoggerInstance```   | *logrus.Logger | работа с установленным ```*logrus.Logger``` (используется при инициализации хука) |
 | ```ValidatorEnable```  | bool           | определение необходимости установки валидации                                     |
 
-Пример установки опции конфигуратора:
+Пример установки формата времени для базового метода работы с пакетом:
+
+```go
+// Инициализация конфигуратора
+if err := config.LoadOptions("filename", "path");  err != nil {
+    logrus.WithError(err).Panic("Unable to load options")
+}
+if err := config.SetOption(types.TimeFormat, time.RFC3339Nano); err != nil {
+    logrus.WithError(err).Panic("Unable to set option")
+}
+```
+
+Пример установки формата времени для конфигуратора:
 
 ```go
 // Инициализация конфигуратора
@@ -178,23 +194,34 @@ type Main struct {
 <a name="omit"></a>
 #### OMIT
 Тег `omit` указывает что поле должно быть проигнорировано при обработке. Это в первую очередь нужно для игнорирования
-полей типа указатель и структура, которые по умолчанию создаются и заполняются.
+полей типа указатель и структура, которые по умолчанию создаются и заполняются.  
 
 ```go
 type Settings struct {
-    StructMustBeOmitted   *MyStruct `omit:"-"`
+    StructMustBeOmitted   *MyStruct `omit:""`
 }
 ```
 <a name="validate"></a>
 #### VALIDATE
 Тег `validate` позволяет указывать правила валидации для полей. Тег заполняется в соответствии с описанием пакета
-[validator](https://github.com/go-playground/validator).
-
-### Файлы конфигурации
-<a name="files"></a>
+[validator](https://github.com/go-playground/validator). Валидацию можно отключить, если установить соответствующую опцию.
 
 ### Поддерживаемые типы
 <a name="types"></a>
 
-### Примеры
-<a name="examples"></a>
+Список поддерживаемых типов представлен в таблице ниже.
+
+| Общее название типа     | Тип в Golang                        | Комментарий                     |
+|-------------------------|-------------------------------------|---------------------------------|
+| Целочисленные           | int, int8, int16, int32, int64      | -                               |
+| Целочисленные без знака | uint, uint8, uint16, uint32, uint64 | -                               |
+| Вещественные числа      | float32, float64                    | -                               |
+| Строки                  | string                              | -                               |
+| Указатели               | * type                              | -                               |
+| Срезы                   | [ ] type                            | -                               |
+| Справочники             | map [ string ] type                 | Ключом может быть только string |
+| Структуры               | struct { types }                    | -                               | 
+
+Типы поддерживают вложенность. Например, можно сделать мапу указателей на слайсы структур. 
+Поддерживаются указатели и на простые типы.
+

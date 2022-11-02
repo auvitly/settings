@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"io"
 	"settings/types"
+	"strings"
 )
 
 type Configurator struct {
@@ -30,19 +31,22 @@ func New(name string, paths ...string) *Configurator {
 	}
 
 	// set filename
-	c.Viper.SetConfigName(name)
-	if len(name) == 0 {
+	r := strings.Split(name, ".")
+	switch len(r) {
+	case 1:
+		c.fileName = name
+		c.Viper.SetConfigName(name)
+	case 2:
+		c.fileName = r[0]
+		c.Viper.SetConfigName(r[0])
+	default:
+		c.fileName = defaultFileName
 		c.Viper.SetConfigName(defaultFileName)
 	}
 
 	// add path
 	if len(paths) != 0 {
 		c.filePaths = append(c.filePaths, paths...)
-	}
-
-	// if the filename is omitted, then use the default filename
-	if len(name) == 0 {
-		c.fileName = defaultFileName
 	}
 
 	// add base file paths
@@ -57,7 +61,7 @@ func New(name string, paths ...string) *Configurator {
 
 }
 
-func (c *Configurator) ReadConfiguration(config io.Reader) error {
+func (c *Configurator) ReadOptions(config io.Reader) error {
 
 	// loading settings into Viper
 	err := c.Viper.ReadConfig(config)
@@ -70,7 +74,7 @@ func (c *Configurator) ReadConfiguration(config io.Reader) error {
 
 }
 
-func (c *Configurator) LoadConfiguration() error {
+func (c *Configurator) LoadOptions() error {
 
 	// loading settings into Viper
 	err := c.Viper.ReadInConfig()
@@ -84,7 +88,7 @@ func (c *Configurator) LoadConfiguration() error {
 
 }
 
-func (c *Configurator) Unmarshal(config interface{}) error {
+func (c *Configurator) LoadSettings(config interface{}) error {
 
 	if root, err := c.newRootHandler(config); err != nil {
 		if c.getValidatorEnable() {
