@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"reflect"
+	"settings/types"
 	"strconv"
 	"time"
 )
@@ -55,7 +56,7 @@ func (c *Configurator) handleBaseTypes(handler *Handler) (err error) {
 						return err
 					}
 				case syslogLevelType:
-					lvl := storageValue.(SyslogLevel)
+					lvl := storageValue.(types.SyslogLevel)
 					handler.reflectValue.Set(reflect.ValueOf(lvl))
 				default:
 					// Processing with classic base types
@@ -106,7 +107,7 @@ func (h *Handler) downloadTagValueBundles() error {
 			if result, ok := os.LookupEnv(field); ok {
 				h.loadValues[tag] = result
 			}
-		// Search among viper values
+		// Search among Viper values
 		case toml, yaml, xml, json:
 			if result, ok := h.parent.storage[field]; ok {
 				switch kind := h.reflectValue.Type().String(); kind {
@@ -117,8 +118,8 @@ func (h *Handler) downloadTagValueBundles() error {
 						return err
 					}
 				case syslogLevelType:
-					lvl, err := logrus.ParseLevel(result.(string))
-					h.loadValues[tag] = SyslogLevel(lvl)
+					lvl, err := types.ParseSyslogPriority(result.(string))
+					h.loadValues[tag] = lvl
 					if err != nil {
 						return err
 					}
@@ -160,8 +161,8 @@ func (h *Handler) downloadTagValueBundles() error {
 							return err
 						}
 					case syslogLevelType:
-						lvl, err := logrus.ParseLevel(result)
-						h.loadValues[tag] = SyslogLevel(lvl)
+						lvl, err := types.ParseSyslogPriority(result)
+						h.loadValues[tag] = lvl
 						if err != nil {
 							return err
 						}

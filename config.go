@@ -18,17 +18,15 @@ type IConfigurator interface {
 	Unmarshal(config interface{}) error
 	// SetOption - настройка конфигуратора
 	SetOption(options types.Options, value interface{}) error
-	// GetViper - возвращает *viper.Viper конфигуратора
-	GetViper() (*viper.Viper, error)
 }
 
-func New(name string, paths ...string) *internal.Configurator {
+func New(name string, paths ...string) IConfigurator {
 	return internal.New(name, paths...)
 }
 
 // Old realisation
 
-var configurator IConfigurator
+var configurator *internal.Configurator
 
 // LoadOptions - функция загружает viper из файла
 func LoadOptions(name string, paths ...string) (*viper.Viper, error) {
@@ -37,7 +35,7 @@ func LoadOptions(name string, paths ...string) (*viper.Viper, error) {
 	if err := configurator.LoadConfiguration(); err != nil {
 		return nil, err
 	}
-	return configurator.GetViper()
+	return configurator.Viper, nil
 }
 
 // LoadSettings - установка значения из viper в структуру, указатель на которую передается в качестве аргумента

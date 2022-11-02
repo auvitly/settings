@@ -27,5 +27,5 @@ import "github.com/auvitly/settings"
 
 ## Documentation
 
-* [Documentation in Russian](README_RU.md)
-* [Documentation in English](README_EN.md)
+* [Documentation in Russian](docs/README_RU.md)
+* [Documentation in English](docs/README_EN.md)

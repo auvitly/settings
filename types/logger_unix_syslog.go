@@ -1,6 +1,14 @@
+//go:build !windows
+// +build !windows
+
 package types
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"log/syslog"
+	"strings"
+)
 
 type Logger struct {
 	LogLevel       logrus.Level `env:"LOG_LEVEL" toml:"level" json:"level" xml:"level" yaml:"level" default:"debug"`
@@ -13,4 +21,27 @@ type Logger struct {
 	Graylog        string       `env:"GRAYLOG" toml:"graylog" json:"graylog" xml:"graylog" yaml:"graylog"`
 }
 
-type SyslogLevel int
+type SyslogLevel syslog.Priority
+
+// ParseSyslogPriority конвертирует уровень логирования для syslog.
+func ParseSyslogPriority(lvl string) (SyslogLevel, error) {
+
+	switch strings.ToLower(lvl) {
+	case "panic":
+		return SyslogLevel(syslog.LOG_EMERG), nil
+	case "fatal":
+		return SyslogLevel(syslog.LOG_CRIT), nil
+	case "error":
+		return SyslogLevel(syslog.LOG_ERR), nil
+	case "warn", "warning":
+		return SyslogLevel(syslog.LOG_WARNING), nil
+	case "info":
+		return SyslogLevel(syslog.LOG_INFO), nil
+	case "debug":
+		return SyslogLevel(syslog.LOG_DEBUG), nil
+	case "trace":
+		return SyslogLevel(syslog.LOG_NOTICE), nil
+	}
+
+	return 0, errors.Errorf("unknown syslog level: %s", lvl)
+}

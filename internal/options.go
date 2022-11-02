@@ -33,6 +33,12 @@ func (c *Configurator) SetOption(options types.Options, value interface{}) error
 			return ErrInvalidOptions
 		}
 		c.options[types.LoggerHook] = logger
+	case types.ValidatorEnable:
+		enable, ok := value.(bool)
+		if !ok {
+			return ErrInvalidOptions
+		}
+		c.options[types.ValidatorEnable] = enable
 	default:
 		return ErrInvalidOptionsType
 	}
@@ -50,6 +56,8 @@ func (c *Configurator) setDefaultOptions() {
 	c.options[types.LoggerHook] = false
 	// Logger
 	c.options[types.LoggerInstance] = logrus.StandardLogger()
+	// Validator
+	c.options[types.ValidatorEnable] = true
 }
 
 func (c *Configurator) getTimeFormat() string {
@@ -66,4 +74,8 @@ func (c *Configurator) getLoggerHook() bool {
 
 func (c *Configurator) getLogger() *logrus.Logger {
 	return c.options[types.LoggerInstance].(*logrus.Logger)
+}
+
+func (c *Configurator) getValidatorEnable() bool {
+	return c.options[types.ValidatorEnable].(bool)
 }

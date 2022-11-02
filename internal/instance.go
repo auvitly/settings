@@ -2,7 +2,6 @@ package internal
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
@@ -13,7 +12,7 @@ type Configurator struct {
 	logger    *logrus.Logger
 	fileName  string
 	filePaths []string
-	viper     *viper.Viper
+	Viper     *viper.Viper
 	config    map[string]interface{}
 	options   map[types.Options]interface{}
 	validator *validator.Validate
@@ -25,15 +24,15 @@ func New(name string, paths ...string) *Configurator {
 		logger:    logrus.StandardLogger(),
 		fileName:  name,
 		filePaths: defaultPaths,
-		viper:     viper.New(),
+		Viper:     viper.New(),
 		options:   make(map[types.Options]interface{}),
 		validator: validator.New(),
 	}
 
 	// set filename
-	c.viper.SetConfigName(name)
+	c.Viper.SetConfigName(name)
 	if len(name) == 0 {
-		c.viper.SetConfigName(defaultFileName)
+		c.Viper.SetConfigName(defaultFileName)
 	}
 
 	// add path
@@ -48,7 +47,7 @@ func New(name string, paths ...string) *Configurator {
 
 	// add base file paths
 	for _, path := range c.filePaths {
-		c.viper.AddConfigPath(path)
+		c.Viper.AddConfigPath(path)
 	}
 
 	// set default options
@@ -60,8 +59,8 @@ func New(name string, paths ...string) *Configurator {
 
 func (c *Configurator) ReadConfiguration(config io.Reader) error {
 
-	// loading settings into viper
-	err := c.viper.ReadConfig(config)
+	// loading settings into Viper
+	err := c.Viper.ReadConfig(config)
 	if err != nil {
 		c.logger.WithError(err).Error("Unable to load file configuration from io.Reader")
 		return err
@@ -73,13 +72,13 @@ func (c *Configurator) ReadConfiguration(config io.Reader) error {
 
 func (c *Configurator) LoadConfiguration() error {
 
-	// loading settings into viper
-	err := c.viper.ReadInConfig()
+	// loading settings into Viper
+	err := c.Viper.ReadInConfig()
 	if err != nil {
 		c.logger.WithError(err).Error("Unable to load file configuration from current paths")
 		return err
 	}
-	c.config = c.viper.AllSettings()
+	c.config = c.Viper.AllSettings()
 
 	return nil
 
@@ -88,8 +87,10 @@ func (c *Configurator) LoadConfiguration() error {
 func (c *Configurator) Unmarshal(config interface{}) error {
 
 	if root, err := c.newRootHandler(config); err != nil {
-		if err = c.validator.Struct(root.reflectValue.Interface()); err != nil {
-			return err
+		if c.getValidatorEnable() {
+			if err = c.validator.Struct(root.reflectValue.Interface()); err != nil {
+				return err
+			}
 		}
 		return err
 	} else {
@@ -99,12 +100,4 @@ func (c *Configurator) Unmarshal(config interface{}) error {
 		return nil
 	}
 
-}
-
-func (c *Configurator) GetViper() (*viper.Viper, error) {
-	if c.viper != nil {
-		return c.viper, nil
-	} else {
-		return nil, errors.New("viper not found")
-	}
 }
