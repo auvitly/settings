@@ -28,4 +28,3 @@ import "github.com/auvitly/settings"
 ## Documentation
 
 * [Documentation in Russian](docs/README_RU.md)
-* [Documentation in English](docs/README_EN.md)

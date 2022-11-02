@@ -97,7 +97,7 @@ func main() {
 
 ```go
 // Инициализация конфигуратора
-if err := config.LoadOptions("filename", "path");  err != nil {
+if _, err := config.LoadOptions(name string, paths ...string);  err != nil {
     logrus.WithError(err).Panic("Unable to load options")
 }
 if err := config.SetOption(types.TimeFormat, time.RFC3339Nano); err != nil {
@@ -220,8 +220,8 @@ type Settings struct {
 | Указатели               | * type                              | -                               |
 | Срезы                   | [ ] type                            | -                               |
 | Справочники             | map [ string ] type                 | Ключом может быть только string |
-| Структуры               | struct { types }                    | -                               | 
+| Структуры               | struct { fields }                   | -                               | 
 
-Типы поддерживают вложенность. Например, можно сделать мапу указателей на слайсы структур. 
-Поддерживаются указатели и на простые типы.
+Типы поддерживают вложенность. Например, можно сделать мапу указателей на слайсы структур и тд. 
+Поддерживаются также указатели и на простые типы.
 
