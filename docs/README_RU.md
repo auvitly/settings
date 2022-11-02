@@ -29,7 +29,7 @@ SetOption(options types.Options, value interface{}) error
 
 Данный способ по умолчанию устанавливает хук на syslog, если используется [стандартная структура настроек логгера](../types/logger_unix_syslog.go):
 
-```go
+````go
 type Logger struct {
 	LogLevel       logrus.Level `env:"LOG_LEVEL" toml:"level" json:"level" xml:"level" yaml:"level" default:"debug"`
 	Syslog         string       `env:"SYSLOG" toml:"syslog_addr" json:"syslog_addr" xml:"syslog_addr" yaml:"syslog_addr" default:"127.0.0.1:514" validate:"tcp_addr"`
@@ -40,7 +40,7 @@ type Logger struct {
 	GraylogLevel   logrus.Level `env:"GRAYLOG_LEVEL" toml:"graylog_level" json:"graylog_level" xml:"graylog_level" yaml:"graylog_level" default:"debug"`
 	Graylog        string       `env:"GRAYLOG" toml:"graylog" json:"graylog" xml:"graylog" yaml:"graylog"`
 }
-```
+````
 
 #### 1.2 Конфигуратор
 
