@@ -1,4 +1,4 @@
-module settings
+module github.com/Auvitly/settings
 
 go 1.16
 
