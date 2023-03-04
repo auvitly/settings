@@ -2,9 +2,10 @@ package internal
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"reflect"
-	"settings/types"
+
+	"github.com/Auvitly/settings/types"
+	"github.com/pkg/errors"
 )
 
 func (c *Configurator) handleMap(handler *Handler) (err error) {

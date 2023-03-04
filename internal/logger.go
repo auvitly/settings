@@ -1,10 +1,11 @@
 package internal
 
 import (
+	"io"
+
+	"github.com/Auvitly/settings/types"
 	graylog "github.com/gemnasium/logrus-graylog-hook"
 	"github.com/sirupsen/logrus"
-	"io"
-	"settings/types"
 )
 
 func (c *Configurator) configureLogger(config types.Logger) error {

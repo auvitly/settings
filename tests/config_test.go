@@ -1,9 +1,10 @@
 package tests
 
 import (
-	"github.com/sirupsen/logrus"
-	config "settings"
 	"testing"
+
+	config "github.com/Auvitly/settings"
+	"github.com/sirupsen/logrus"
 )
 
 func TestBaseTypes(t *testing.T) {

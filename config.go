@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"io"
-	"settings/internal"
-	"settings/types"
+
+	"github.com/Auvitly/settings/internal"
+	"github.com/Auvitly/settings/types"
+	"github.com/spf13/viper"
 )
 
 // General

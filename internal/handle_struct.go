@@ -1,12 +1,13 @@
 package internal
 
 import (
-	"github.com/pkg/errors"
 	"net/url"
 	"os"
 	"reflect"
-	"settings/types"
 	"time"
+
+	"github.com/Auvitly/settings/types"
+	"github.com/pkg/errors"
 )
 
 func (c *Configurator) handleStruct(handler *Handler) (err error) {

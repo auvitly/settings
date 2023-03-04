@@ -1,12 +1,13 @@
 package internal
 
 import (
+	"io"
+	"strings"
+
+	"github.com/Auvitly/settings/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"io"
-	"settings/types"
-	"strings"
 )
 
 type Configurator struct {

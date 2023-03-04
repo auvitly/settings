@@ -4,8 +4,8 @@
 package internal
 
 import (
+	"github.com/Auvitly/settings/types"
 	"github.com/sirupsen/logrus"
-	"settings/types"
 )
 
 // syslogHook создает пустой хук для сислога (на самом деле нет)

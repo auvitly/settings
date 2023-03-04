@@ -2,8 +2,9 @@ package tests
 
 import (
 	"net/url"
-	"settings/types"
 	"time"
+
+	"github.com/Auvitly/settings/types"
 )
 
 type Config struct {

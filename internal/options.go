@@ -1,9 +1,10 @@
 package internal
 
 import (
-	"github.com/sirupsen/logrus"
-	"settings/types"
 	"time"
+
+	"github.com/Auvitly/settings/types"
+	"github.com/sirupsen/logrus"
 )
 
 func (c *Configurator) SetOption(options types.Options, value interface{}) error {

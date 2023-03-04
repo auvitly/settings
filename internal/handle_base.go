@@ -2,13 +2,14 @@ package internal
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"os"
 	"reflect"
-	"settings/types"
 	"strconv"
 	"time"
+
+	"github.com/Auvitly/settings/types"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // When processing simple values, several stages can be distinguished:
