@@ -92,13 +92,13 @@ func (c *Configurator) LoadOptions() error {
 func (c *Configurator) LoadSettings(config interface{}) error {
 
 	if root, err := c.newRootHandler(config); err != nil {
+		return err
+	} else {
 		if c.getValidatorEnable() {
 			if err = c.validator.Struct(root.reflectValue.Interface()); err != nil {
 				return err
 			}
 		}
-		return err
-	} else {
 		if err = c.handle(root); err != nil {
 			return err
 		}
