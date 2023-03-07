@@ -16,7 +16,7 @@
 
 1. Load the package into the project
 ``` 
-go get git.qvant.ru/go-libs/settings 
+go get github.com/auvitly/settings
 ```
 
 2. Import the package at the place of use
